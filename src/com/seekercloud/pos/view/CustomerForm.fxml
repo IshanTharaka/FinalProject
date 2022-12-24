@@ -35,7 +35,7 @@
          </cursor>
       </JFXButton>
       <Separator layoutX="430.0" layoutY="42.0" prefHeight="0.0" prefWidth="640.0" />
-      <TextField fx:id="txtID" layoutX="20.0" layoutY="123.0" prefHeight="44.0" prefWidth="181.0" promptText="Customer ID">
+      <TextField fx:id="txtID" disable="true" layoutX="20.0" layoutY="123.0" prefHeight="44.0" prefWidth="181.0" promptText="Customer ID">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>

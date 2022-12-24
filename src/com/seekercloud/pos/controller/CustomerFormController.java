@@ -31,6 +31,8 @@ public class CustomerFormController {
 
     public void initialize(){
         setTableData();
+        setCustomerID();
+
         colID.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
@@ -42,6 +44,10 @@ public class CustomerFormController {
     }
 
     public void saveUpdateOnAction(ActionEvent actionEvent) {
+        if(txtName.getText().isEmpty() || txtAddress.getText().isEmpty() || txtSalary.getText().isEmpty()){
+            new Alert(Alert.AlertType.INFORMATION,"Please fill the all the details to save the customer!").show();
+            return;
+        }
         Customer customer = new Customer(
                 txtID.getText(),
                 txtName.getText(),
@@ -51,9 +57,15 @@ public class CustomerFormController {
         if (Database.customerTable.add(customer)){
             new Alert(Alert.AlertType.CONFIRMATION,"Customer Saved!").show();
             setTableData();
+            setCustomerID();
+            clearFieldData();
         }else {
             new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
         }
+    }
+
+    public void clearFieldData(){
+        txtName.clear();txtAddress.clear();txtSalary.clear();
     }
 
     private void setTableData(){
@@ -74,5 +86,33 @@ public class CustomerFormController {
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
 
+    }
+
+    private  void setCustomerID(){
+        // get last saved customer
+        // catch the id (C-001)
+        // separate the number from the character
+        // increment the separated number
+        // concat the character again to the incremented number (C-002)
+        // set customer ID
+
+        if(!Database.customerTable.isEmpty()){
+            Customer c = Database.customerTable.get(Database.customerTable.size()-1);
+            String id = c.getId();
+            String dataArray[] = id.split("-");  // ==> ["C","001"]
+            id = dataArray[1];     // "001"
+            int oldNum = Integer.parseInt(id);   // 1 => 00 remove
+            oldNum++;       // 2
+
+            if (oldNum<9){
+                txtID.setText("C-00"+oldNum);
+            }else if (oldNum<99){
+                txtID.setText("C-0"+oldNum);
+            }else {
+                txtID.setText("C-"+oldNum);
+            }
+        }else {
+            txtID.setText("C-001");
+        }
     }
 }
