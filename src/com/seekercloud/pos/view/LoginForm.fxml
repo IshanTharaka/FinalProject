@@ -27,17 +27,17 @@
                         <Font name="Bodoni MT" size="20.0" />
                      </font>
                   </Label>
-                  <JFXTextField labelFloat="true" layoutX="44.0" layoutY="176.0" prefHeight="29.0" prefWidth="358.0" promptText="User Name">
+                  <JFXTextField fx:id="txtEmail" labelFloat="true" layoutX="44.0" layoutY="176.0" prefHeight="29.0" prefWidth="358.0" promptText="Email">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </JFXTextField>
-                  <JFXPasswordField labelFloat="true" layoutX="44.0" layoutY="252.0" prefHeight="29.0" prefWidth="358.0" promptText="Password">
+                  <JFXPasswordField fx:id="txtPassword" labelFloat="true" layoutX="44.0" layoutY="252.0" prefHeight="29.0" prefWidth="358.0" promptText="Password">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </JFXPasswordField>
-                  <JFXButton buttonType="RAISED" layoutX="43.0" layoutY="345.0" prefHeight="56.0" prefWidth="358.0" style="-fx-background-color: #3498DB;" text="Login" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="43.0" layoutY="345.0" onAction="#loginOnAction" prefHeight="56.0" prefWidth="358.0" style="-fx-background-color: #3498DB;" text="Login" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>

@@ -12,7 +12,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.SignUpFormController">
+<AnchorPane fx:id="signupFormContext" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.SignUpFormController">
    <children>
       <AnchorPane prefHeight="768.0" prefWidth="512.0" style="-fx-background-color: #CCE4FF;">
          <children>
@@ -46,7 +46,7 @@
                   <Separator layoutX="41.0" layoutY="458.0" prefHeight="3.0" prefWidth="152.0" />
                   <Label layoutX="212.0" layoutY="450.0" text="OR" />
                   <Separator layoutX="248.0" layoutY="459.0" prefHeight="3.0" prefWidth="152.0" />
-                  <JFXButton buttonType="RAISED" layoutX="43.0" layoutY="473.0" prefHeight="56.0" prefWidth="358.0" style="-fx-background-color: #34495E;" text="Already Have an Account" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="43.0" layoutY="473.0" onAction="#alreadyHaveAnAccountOnAction" prefHeight="56.0" prefWidth="358.0" style="-fx-background-color: #34495E;" text="Already Have an Account" textFill="WHITE">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
@@ -63,11 +63,11 @@
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </JFXTextField>
-                  <JFXTextField fx:id="txtRePassowrd" labelFloat="true" layoutX="40.0" layoutY="338.0" prefHeight="29.0" prefWidth="358.0" promptText="Re-Password">
+                  <JFXPasswordField fx:id="txtRePassword" labelFloat="true" layoutX="41.0" layoutY="339.0" prefHeight="29.0" prefWidth="358.0" promptText="Re-Password">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
-                  </JFXTextField>
+                  </JFXPasswordField>
                </children>
             </AnchorPane>
          </children>
