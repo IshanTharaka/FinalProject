@@ -1,14 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.seekercloud.pos.controller.CustomerFormController"
-            prefHeight="400.0" prefWidth="600.0">
 
+<AnchorPane fx:id="customerFormContext" prefHeight="850.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.CustomerFormController">
+   <children>
+      <JFXButton layoutX="20.0" layoutY="21.0" onAction="#bachToHomeOnAction" style="-fx-background-color: #27AE60;" text="Back to Home" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <Label layoutX="214.0" layoutY="30.0" text="Customer Management">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <JFXButton layoutX="1091.0" layoutY="22.0" style="-fx-background-color: #34495E;" text="+ New Customer" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <Separator layoutX="430.0" layoutY="42.0" prefHeight="0.0" prefWidth="640.0" />
+      <TextField fx:id="txtID" layoutX="20.0" layoutY="123.0" prefHeight="44.0" prefWidth="181.0" promptText="Customer ID">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtSalary" layoutX="1051.0" layoutY="123.0" prefHeight="44.0" prefWidth="227.0" promptText="Customer Salary">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtName" layoutX="237.0" layoutY="123.0" prefHeight="44.0" prefWidth="307.0" promptText="Customer Name">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </TextField>
+      <TextField fx:id="txtAddress" layoutX="582.0" layoutY="123.0" prefHeight="44.0" prefWidth="434.0" promptText="Customer Address">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </TextField>
+      <JFXButton layoutX="1110.0" layoutY="224.0" onAction="#saveUpdateOnAction" style="-fx-background-color: #3498DB;" text="Save Customer" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <TextField layoutX="20.0" layoutY="292.0" prefHeight="44.0" prefWidth="307.0" promptText="Search Here">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </TextField>
+      <TableView layoutX="20.0" layoutY="367.0" prefHeight="414.0" prefWidth="1257.0">
+        <columns>
+          <TableColumn prefWidth="141.0" text="Customer ID" />
+          <TableColumn prefWidth="308.0000305175781" text="Customer Name" />
+            <TableColumn prefWidth="426.0" text="Customer Address" />
+            <TableColumn prefWidth="194.0" text="Customer Salary" />
+            <TableColumn prefWidth="187.0" text="Option" />
+        </columns>
+      </TableView>
+      <Label layoutX="1157.0" layoutY="809.0" text="Version : 1.0.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="20.0" layoutY="809.0" text="EasyPOS">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+   </children>
 </AnchorPane>

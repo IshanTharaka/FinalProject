@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane prefHeight="850.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.DashBoardFormController">
+<AnchorPane fx:id="dashBoardContext" prefHeight="850.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.DashBoardFormController">
    <children>
       <Label layoutX="14.0" layoutY="14.0" text="EasyPOS">
          <font>
@@ -40,7 +40,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <children>
-            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" onMouseClicked="#openCustomerFormOnAction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../asserts/Dashboard/Customer.png" />
                </image>
@@ -52,9 +52,9 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <children>
-            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="52.0" layoutY="41.0" onMouseClicked="#openPlaceOrderFormOnAction" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../asserts/Dashboard/Products.png" />
+                  <Image url="@../asserts/Dashboard/Place-order.png" />
                </image>
             </ImageView>
          </children>
@@ -64,7 +64,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <children>
-            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" onMouseClicked="#openStatisticsFormOnAction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../asserts/Dashboard/Statistics.png" />
                </image>
@@ -76,9 +76,9 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <children>
-            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" onMouseClicked="#openProductsFormOnAction" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../asserts/Dashboard/Place-order.png" />
+                  <Image url="@../asserts/Dashboard/Products.png" />
                </image>
             </ImageView>
          </children>
@@ -88,7 +88,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <children>
-            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="201.0" fitWidth="263.0" layoutX="45.0" layoutY="40.0" onMouseClicked="#openOrderDetailsFormOnAction" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../asserts/Dashboard/Order-details.png" />
                </image>
@@ -100,7 +100,7 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <Label layoutX="608.0" layoutY="460.0" text="Products" textFill="#3498db">
+      <Label layoutX="953.0" layoutY="410.0" text="Product Management" textFill="#3498db">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
@@ -115,7 +115,7 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <Label layoutX="997.0" layoutY="410.0" text="Place Order" textFill="#3498db">
+      <Label layoutX="596.0" layoutY="448.0" text="Place Order" textFill="#3498db">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
