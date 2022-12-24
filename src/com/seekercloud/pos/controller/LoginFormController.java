@@ -19,11 +19,12 @@ public class LoginFormController {
     public JFXTextField txtEmail;
 
     public void createAnAccountOnAction(ActionEvent actionEvent) throws IOException {
-        setUI("SignUpForm");
+        setUI("SignUpForm","Signup Form");
     }
 
-    private void setUI(String location) throws IOException {
+    private void setUI(String location,String title) throws IOException {
         Stage window= (Stage) loginFormContext.getScene().getWindow();
+        window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
 
     }
@@ -45,7 +46,7 @@ public class LoginFormController {
                 // is correct => redirect to the dashboard otherwise the system must show the error.
                 if (u.getPassword().equals(password)){
                     Thread.sleep(2000);
-                    setUI("DashBoardForm");
+                    setUI("DashBoardForm",u.getEmail());
                 }else {
                     new Alert(Alert.AlertType.WARNING,"Password is Incorrect!").show();
                 }

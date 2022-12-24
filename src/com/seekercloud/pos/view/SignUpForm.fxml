@@ -63,7 +63,7 @@
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </JFXTextField>
-                  <JFXPasswordField fx:id="txtRePassword" labelFloat="true" layoutX="41.0" layoutY="339.0" prefHeight="29.0" prefWidth="358.0" promptText="Re-Password">
+                  <JFXPasswordField fx:id="txtRePassword" labelFloat="true" layoutX="41.0" layoutY="337.0" prefHeight="29.0" prefWidth="358.0" promptText="Re-Password">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>
