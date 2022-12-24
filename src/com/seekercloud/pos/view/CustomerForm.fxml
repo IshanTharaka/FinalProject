@@ -68,13 +68,13 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </TextField>
-      <TableView layoutX="20.0" layoutY="367.0" prefHeight="414.0" prefWidth="1257.0">
+      <TableView fx:id="tblCustomer" layoutX="20.0" layoutY="367.0" prefHeight="414.0" prefWidth="1257.0">
         <columns>
-          <TableColumn prefWidth="141.0" text="Customer ID" />
-          <TableColumn prefWidth="308.0000305175781" text="Customer Name" />
-            <TableColumn prefWidth="426.0" text="Customer Address" />
-            <TableColumn prefWidth="194.0" text="Customer Salary" />
-            <TableColumn prefWidth="187.0" text="Option" />
+          <TableColumn fx:id="colID" prefWidth="141.0" text="Customer ID" />
+          <TableColumn fx:id="colName" prefWidth="308.0000305175781" text="Customer Name" />
+            <TableColumn fx:id="colAddress" prefWidth="426.0" text="Customer Address" />
+            <TableColumn fx:id="colSalary" prefWidth="194.0" text="Customer Salary" />
+            <TableColumn fx:id="colOption" prefWidth="187.0" text="Option" />
         </columns>
       </TableView>
       <Label layoutX="1157.0" layoutY="809.0" text="Version : 1.0.0">
