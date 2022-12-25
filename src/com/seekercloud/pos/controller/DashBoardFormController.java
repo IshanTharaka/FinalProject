@@ -61,7 +61,8 @@ public class DashBoardFormController {
     public void openStatisticsFormOnAction(MouseEvent mouseEvent) {
     }
 
-    public void openProductsFormOnAction(MouseEvent mouseEvent) {
+    public void openProductsFormOnAction(MouseEvent mouseEvent) throws IOException {
+        setUI("ProductForm","Product");
     }
 
     public void openOrderDetailsFormOnAction(MouseEvent mouseEvent) {
