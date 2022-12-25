@@ -10,7 +10,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane fx:id="customerFormContext" prefHeight="850.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.CustomerFormController">
    <children>
       <JFXButton layoutX="20.0" layoutY="21.0" onAction="#bachToHomeOnAction" style="-fx-background-color: #27AE60;" text="Back to Home" textFill="WHITE">
@@ -26,7 +25,7 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <JFXButton layoutX="1091.0" layoutY="22.0" style="-fx-background-color: #34495E;" text="+ New Customer" textFill="WHITE">
+      <JFXButton layoutX="1091.0" layoutY="22.0" onAction="#newCustomerOnAction" style="-fx-background-color: #34495E;" text="+ New Customer" textFill="WHITE">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
@@ -55,7 +54,7 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </TextField>
-      <JFXButton layoutX="1110.0" layoutY="224.0" onAction="#saveUpdateOnAction" style="-fx-background-color: #3498DB;" text="Save Customer" textFill="WHITE">
+      <JFXButton fx:id="btnSaveUpdate" layoutX="1051.0" layoutY="224.0" onAction="#saveUpdateOnAction" prefHeight="44.0" prefWidth="227.0" style="-fx-background-color: #3498DB;" text="Save Customer" textFill="WHITE">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
@@ -63,7 +62,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXButton>
-      <TextField layoutX="20.0" layoutY="292.0" prefHeight="44.0" prefWidth="307.0" promptText="Search Here">
+      <TextField fx:id="txtSearch" layoutX="20.0" layoutY="292.0" prefHeight="44.0" prefWidth="307.0" promptText="Search Here">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
@@ -87,5 +86,13 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
+      <JFXButton layoutX="865.0" layoutY="224.0" onAction="#clearDataOnAction" prefHeight="44.0" prefWidth="161.0" style="-fx-background-color: #3498DB;" text="Clear Data" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
    </children>
 </AnchorPane>

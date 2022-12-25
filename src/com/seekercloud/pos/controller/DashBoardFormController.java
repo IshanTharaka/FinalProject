@@ -3,6 +3,7 @@ package com.seekercloud.pos.controller;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -51,7 +52,7 @@ public class DashBoardFormController {
     }
 
     public void openCustomerFormOnAction(MouseEvent mouseEvent) throws IOException {
-        setUI("CustomerForm","Customer Form");
+        setUI("CustomerForm","Customer");
     }
 
     public void openPlaceOrderFormOnAction(MouseEvent mouseEvent) {
@@ -71,5 +72,9 @@ public class DashBoardFormController {
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
 
+    }
+
+    public void logoutOnAction(ActionEvent actionEvent) throws IOException {
+        setUI("LoginForm","Login Form");
     }
 }

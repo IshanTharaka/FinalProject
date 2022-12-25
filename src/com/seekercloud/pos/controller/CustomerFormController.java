@@ -1,5 +1,6 @@
 package com.seekercloud.pos.controller;
 
+import com.jfoenix.controls.JFXButton;
 import com.seekercloud.pos.db.Database;
 import com.seekercloud.pos.model.Customer;
 import com.seekercloud.pos.view.tm.CustomerTM;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class CustomerFormController {
     public AnchorPane customerFormContext;
@@ -28,9 +30,13 @@ public class CustomerFormController {
     public TableColumn colSalary;
     public TableColumn colOption;
     public TableView<CustomerTM> tblCustomer;
+    public JFXButton btnSaveUpdate;
+    public TextField txtSearch;
+
+    private String searchText="";
 
     public void initialize(){
-        setTableData();
+        setTableData(searchText);
         setCustomerID();
 
         colID.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -38,6 +44,30 @@ public class CustomerFormController {
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
         colSalary.setCellValueFactory(new PropertyValueFactory<>("salary"));
         colOption.setCellValueFactory(new PropertyValueFactory<>("btn"));
+
+        // ===== Listener for table========
+        tblCustomer.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
+            if (null!=newValue){
+                setCustomerData(newValue);
+            }
+        });
+
+        // ===== Listener for search========
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            searchText=newValue;
+            setTableData(searchText);
+        });
+    }
+
+    private  void setCustomerData(CustomerTM tm){
+        txtID.setText(tm.getId());
+        txtName.setText(tm.getName());
+        txtAddress.setText(tm.getAddress());
+        txtSalary.setText(String.valueOf(tm.getSalary()));
+
+        btnSaveUpdate.setText("Update Customer");
     }
     public void bachToHomeOnAction(ActionEvent actionEvent) throws IOException {
         setUI("DashBoardForm","Dashboard");
@@ -54,28 +84,67 @@ public class CustomerFormController {
                 txtAddress.getText(),
                 Double.parseDouble(txtSalary.getText())
         );
-        if (Database.customerTable.add(customer)){
-            new Alert(Alert.AlertType.CONFIRMATION,"Customer Saved!").show();
-            setTableData();
-            setCustomerID();
-            clearFieldData();
+
+        if(btnSaveUpdate.getText().equalsIgnoreCase("Save Customer")){
+            // save
+            if (Database.customerTable.add(customer)){
+                new Alert(Alert.AlertType.CONFIRMATION,"Customer Saved!").show();
+                setTableData(searchText);
+                setCustomerID();
+                clear();
+            }else {
+                new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
+            }
         }else {
-            new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
+            for (Customer c: Database.customerTable
+                 ) {
+                if (txtID.getText().equalsIgnoreCase(c.getId())){
+                    c.setName(txtName.getText());
+                    c.setAddress(txtAddress.getText());
+                    c.setSalary(Double.parseDouble(txtSalary.getText()));
+                    new Alert(Alert.AlertType.CONFIRMATION,"Customer Details Updated!").show();
+                    setTableData(searchText);
+                    clear();
+                }
+            }
         }
+
+    }
+
+    public void clear(){
+        btnSaveUpdate.setText("Save Customer");
+        clearFieldData();
+        setCustomerID();
     }
 
     public void clearFieldData(){
         txtName.clear();txtAddress.clear();txtSalary.clear();
     }
 
-    private void setTableData(){
+    private void setTableData(String text){
+        text = text.toLowerCase();
         ArrayList<Customer> customerList = Database.customerTable;
         ObservableList<CustomerTM> obList = FXCollections.observableArrayList();
         for (Customer c : customerList
              ) {
-            Button btn = new Button("Delete");
-            CustomerTM tm = new CustomerTM(c.getId(),c.getName(),c.getAddress(),c.getSalary(),btn);
-            obList.add(tm);
+            if(c.getName().toLowerCase().contains(text) || c.getAddress().toLowerCase().contains(text)){
+                Button btn = new Button("Delete");
+                CustomerTM tm = new CustomerTM(c.getId(),c.getName(),c.getAddress(),c.getSalary(),btn);
+                obList.add(tm);
+
+                btn.setOnAction(event -> {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                            "Are you sure?",
+                            ButtonType.YES,ButtonType.NO);
+                    Optional<ButtonType> val = alert.showAndWait();
+                    if (val.get()==ButtonType.YES){
+                        Database.customerTable.remove(c);
+                        new Alert(Alert.AlertType.INFORMATION,"Customer Deleted!").show();
+                        setTableData(searchText);
+                        clear();
+                    }
+                });
+            }
         }
         tblCustomer.setItems(obList);
 
@@ -114,5 +183,13 @@ public class CustomerFormController {
         }else {
             txtID.setText("C-001");
         }
+    }
+
+    public void clearDataOnAction(ActionEvent actionEvent) {
+        clear();
+    }
+
+    public void newCustomerOnAction(ActionEvent actionEvent) {
+        clear();
     }
 }
