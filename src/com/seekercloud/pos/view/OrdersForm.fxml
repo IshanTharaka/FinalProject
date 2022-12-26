@@ -1,14 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXDatePicker?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.seekercloud.pos.controller.OrdersFormController"
-            prefHeight="400.0" prefWidth="600.0">
 
+<AnchorPane fx:id="orderFormContext" prefHeight="850.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.OrdersFormController">
+   <children>
+      <JFXButton layoutX="26.0" layoutY="30.0" onAction="#backToHomeOnAction" style="-fx-background-color: #27AE60;" text="Back to Home" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <Separator layoutX="295.0" layoutY="54.0" prefHeight="3.0" prefWidth="972.0" />
+      <TableView fx:id="tblOrders" layoutX="26.0" layoutY="282.0" prefHeight="493.0" prefWidth="1245.0">
+         <columns>
+            <TableColumn fx:id="colOrderID" prefWidth="175.0" text="Order ID" />
+            <TableColumn fx:id="colDate" prefWidth="342.0" text="Date" />
+            <TableColumn fx:id="colTotalCost" prefWidth="242.0" text="Total Cost" />
+            <TableColumn fx:id="colCustomerID" prefWidth="264.0" text="Customer ID" />
+            <TableColumn fx:id="colOption" prefWidth="221.0" text="Option" />
+         </columns>
+      </TableView>
+      <Label layoutX="1152.0" layoutY="813.0" text="Version : 1.0.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="26.0" layoutY="813.0" text="EasyPOS">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="216.0" layoutY="39.0" text="Orders">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Separator layoutX="26.0" layoutY="228.0" prefHeight="3.0" prefWidth="1245.0" />
+      <JFXDatePicker defaultColor="#2638ff" layoutX="28.0" layoutY="121.0" prefHeight="44.0" prefWidth="248.0" promptText="From" />
+      <JFXDatePicker defaultColor="#2638ff" layoutX="346.0" layoutY="121.0" prefHeight="44.0" prefWidth="248.0" promptText="To" />
+   </children>
 </AnchorPane>
