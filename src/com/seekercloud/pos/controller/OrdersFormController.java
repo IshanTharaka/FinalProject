@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -34,6 +35,29 @@ public class OrdersFormController {
         colOption.setCellValueFactory(new PropertyValueFactory<>("btn"));
 
         loadData();
+
+         //=======================
+        tblOrders.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue!=null){
+                try {
+                    openDetailsUI(newValue);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+         //=======================
+
+    }
+
+    private void openDetailsUI(OrdersDetailsTM value) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/OrderDetailsForm.fxml"));
+        Parent parent = fxmlLoader.load();
+        OrderDetailsFormController detailsController = fxmlLoader.getController();
+        detailsController.loadData(value.getOrderID());
+        Stage stage = new Stage();
+        stage.setScene(new Scene(parent));
+        stage.show();
     }
 
     private void loadData() {
