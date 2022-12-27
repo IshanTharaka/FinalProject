@@ -75,7 +75,7 @@ public class DashBoardFormController {
         Stage window= (Stage) dashBoardContext.getScene().getWindow();
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
-
+        window.centerOnScreen();
     }
 
     public void logoutOnAction(ActionEvent actionEvent) throws IOException {

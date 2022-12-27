@@ -1,6 +1,6 @@
-package com.seekercloud.pos.model;
+package com.seekercloud.pos.entity;
 
-public class Customer {
+public class Customer implements SuperEntity {
     private String id;
     private String name;
     private String address;
@@ -10,10 +10,10 @@ public class Customer {
     }
 
     public Customer(String id, String name, String address, double salary) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.salary = salary;
+        this.setId(id);
+        this.setName(name);
+        this.setAddress(address);
+        this.setSalary(salary);
     }
 
     public String getId() {
@@ -47,14 +47,6 @@ public class Customer {
     public void setSalary(double salary) {
         this.salary = salary;
     }
+    // save customer
 
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", salary=" + salary +
-                '}';
-    }
 }

@@ -1,7 +1,7 @@
 package com.seekercloud.pos.controller;
 
-import com.seekercloud.pos.db.Database;
-import com.seekercloud.pos.model.Order;
+import com.jfoenix.controls.JFXDatePicker;
+import com.seekercloud.pos.db.DBConnection;
 import com.seekercloud.pos.view.tm.OrdersDetailsTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,7 +15,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class OrdersFormController {
@@ -26,8 +29,12 @@ public class OrdersFormController {
     public TableColumn colTotalCost;
     public TableColumn colCustomerID;
     public TableColumn colOption;
+    public JFXDatePicker dtFrom;
+    public JFXDatePicker dtTo;
 
     public void initialize(){
+
+
         colOrderID.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colTotalCost.setCellValueFactory(new PropertyValueFactory<>("total"));
@@ -35,7 +42,7 @@ public class OrdersFormController {
         colOption.setCellValueFactory(new PropertyValueFactory<>("btn"));
 
         loadData();
-
+      //  shortAccordingToDate();
          //=======================
         tblOrders.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue!=null){
@@ -50,7 +57,9 @@ public class OrdersFormController {
 
     }
 
+
     private void openDetailsUI(OrdersDetailsTM value) throws IOException {
+
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/OrderDetailsForm.fxml"));
         Parent parent = fxmlLoader.load();
         OrderDetailsFormController detailsController = fxmlLoader.getController();
@@ -58,32 +67,59 @@ public class OrdersFormController {
         Stage stage = new Stage();
         stage.setScene(new Scene(parent));
         stage.show();
+
     }
 
     private void loadData() {
-        ObservableList<OrdersDetailsTM> tmList = FXCollections.observableArrayList();
-        for (Order o : Database.orderTable
-             ) {
-            Button btn = new Button("Delete");
-            OrdersDetailsTM tm = new OrdersDetailsTM(
-                    o.getOrderID(),
-                    new SimpleDateFormat("yyyy-MM-dd").format(o.getPlaceDate()),
-                    o.getTotal(),o.getCustomer(),btn);
-            tmList.add(tm);
+        String fromDate = dtFrom.getEditor().getText();
+        String toDate = dtTo.getEditor().getText();
 
-            btn.setOnAction(event -> {
+//        if (){
+//
+//        }
+        try {
+            String sql = "SELECT * FROM `Order`";
+            PreparedStatement statement = DBConnection.getInstance().getConnection().prepareStatement(sql);
+            ResultSet set = statement.executeQuery();
+
+            ObservableList<OrdersDetailsTM> tmList = FXCollections.observableArrayList();
+
+            while (set.next()){
+                Button btn = new Button("Delete");
+                OrdersDetailsTM tm = new OrdersDetailsTM(set.getString(1),
+                        set.getString(2),
+                        set.getDouble(3),
+                        set.getString(4),
+                        btn);
+                tmList.add(tm);
+
+                btn.setOnAction(event -> {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                         "Are you sure?",
                         ButtonType.YES,ButtonType.NO);
                 Optional<ButtonType> val = alert.showAndWait();
                 if (val.get()==ButtonType.YES){
-                    Database.orderTable.remove(o);
-                    new Alert(Alert.AlertType.INFORMATION,"Order Deleted!").show();
-                    loadData();
+                    try {
+                        String sql1 = "DELETE FROM `Order` WHERE orderId=?";
+                        PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
+                        statement1.setString(1,tm.getOrderID());
+
+                        if(statement1.executeUpdate()>0){
+                            new Alert(Alert.AlertType.INFORMATION,"Order Deleted!").show();
+                            loadData();
+                        }else {
+                            new Alert(Alert.AlertType.WARNING,"Try Again!").show();
+                        }
+                    } catch (ClassNotFoundException | SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
+            }
+            tblOrders.setItems(tmList);
+        }catch (SQLException | ClassNotFoundException e){
+            e.printStackTrace();
         }
-        tblOrders.setItems(tmList);
     }
 
     public void backToHomeOnAction(ActionEvent actionEvent) throws IOException {
@@ -94,7 +130,8 @@ public class OrdersFormController {
         Stage window= (Stage) orderFormContext.getScene().getWindow();
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
-
+        window.centerOnScreen();
     }
+
 
 }

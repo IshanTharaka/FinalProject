@@ -26,7 +26,7 @@ public class LoginFormController {
         Stage window= (Stage) loginFormContext.getScene().getWindow();
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
-
+        window.centerOnScreen();
     }
 
     public void loginOnAction(ActionEvent actionEvent) throws IOException, InterruptedException {

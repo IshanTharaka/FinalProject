@@ -1,10 +1,16 @@
 package com.seekercloud.pos.controller;
 
 import com.jfoenix.controls.JFXButton;
-import com.seekercloud.pos.db.Database;
-import com.seekercloud.pos.model.Customer;
-import com.seekercloud.pos.model.Product;
-import com.seekercloud.pos.view.tm.CustomerTM;
+import com.seekercloud.pos.bo.BoFactory;
+import com.seekercloud.pos.bo.BoTypes;
+import com.seekercloud.pos.bo.custom.ProductBo;
+import com.seekercloud.pos.dao.DaoFactory;
+import com.seekercloud.pos.dao.DaoTypes;
+import com.seekercloud.pos.dao.custom.ProductDao;
+import com.seekercloud.pos.dao.custom.impl.ProductDaoImpl;
+import com.seekercloud.pos.db.DBConnection;
+import com.seekercloud.pos.dto.ProductDto;
+import com.seekercloud.pos.entity.Product;
 import com.seekercloud.pos.view.tm.ProductTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,6 +23,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -37,6 +44,9 @@ public class ProductFormController {
     public TableColumn colOption;
 
     private String searchText="";
+
+    private ProductBo productBo = BoFactory.getInstance().getBo(BoTypes.PRODUCT);
+
     public void initialize(){
         setTableData(searchText);
         setProductCode();
@@ -74,14 +84,19 @@ public class ProductFormController {
     }
 
     private void setTableData(String text){
-        text = text.toLowerCase();
-        ArrayList<Product> productList = Database.productTable;
-        ObservableList<ProductTM> obList = FXCollections.observableArrayList();
-        for (Product p : productList
-        ) {
-            if(p.getDescription().toLowerCase().contains(text)){
+        searchText = "%"+text+"%";
+        try {
+            ObservableList<ProductTM> obList = FXCollections.observableArrayList();
+
+            ArrayList<ProductDto> productList = productBo.searchProducts(searchText);
+            for (ProductDto p : productList){
                 Button btn = new Button("Delete");
-                ProductTM tm = new ProductTM(p.getCode(),p.getDescription(),p.getUnitPrice(),p.getQtyOnHand(),btn);
+                ProductTM tm = new ProductTM(
+                        p.getCode(),
+                        p.getDescription(),
+                        p.getUnitPrice(),
+                        p.getQtyOnHand(),
+                        btn);
                 obList.add(tm);
 
                 btn.setOnAction(event -> {
@@ -90,16 +105,25 @@ public class ProductFormController {
                             ButtonType.YES,ButtonType.NO);
                     Optional<ButtonType> val = alert.showAndWait();
                     if (val.get()==ButtonType.YES){
-                        Database.productTable.remove(p);
-                        new Alert(Alert.AlertType.INFORMATION,"Product Deleted!").show();
-                        setTableData(searchText);
-                        clear();
+                        try {
+                            if(productBo.deleteProduct(tm.getCode())){
+                                new Alert(Alert.AlertType.INFORMATION,"Product Deleted!").show();
+                                setTableData(searchText);
+                                clear();
+                            }else {
+                                new Alert(Alert.AlertType.WARNING,"Try Again!").show();
+                            }
+                        } catch (ClassNotFoundException | SQLException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             }
-        }
-        tblProduct.setItems(obList);
+            tblProduct.setItems(obList);
 
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
     public void clear(){
         btnSaveUpdate.setText("Save Product");
@@ -118,11 +142,12 @@ public class ProductFormController {
         Stage window= (Stage) productFormContext.getScene().getWindow();
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
-
+        window.centerOnScreen();
     }
 
     public void newProductOnAction(ActionEvent actionEvent) {
         clear();
+        txtDescription.requestFocus();
     }
 
     public void saveProductOnAction(ActionEvent actionEvent) {
@@ -130,61 +155,106 @@ public class ProductFormController {
             new Alert(Alert.AlertType.INFORMATION,"Please fill the all the details to save the product!").show();
             return;
         }
-        Product product = new Product(
-                txtCode.getText(),
-                txtDescription.getText(),
-                Double.parseDouble(txtUnitPrice.getText()),
-                Integer.parseInt(txtQtyOnHand.getText())
-        );
+
+        if (!isNumeric(txtUnitPrice.getText())){
+            new Alert(Alert.AlertType.WARNING,"Unit price must be a number!").show();
+            txtUnitPrice.requestFocus();
+            return;
+        } else if (!isNumeric(txtQtyOnHand.getText())) {
+            new Alert(Alert.AlertType.WARNING,"QTY on hand must be a number!").show();
+            txtQtyOnHand.requestFocus();
+            return;
+        }
 
         if(btnSaveUpdate.getText().equalsIgnoreCase("Save Product")){
             // save
-            if (Database.productTable.add(product)){
-                new Alert(Alert.AlertType.CONFIRMATION,"Product Saved!").show();
-                setTableData(searchText);
-                setProductCode();
-                clear();
-            }else {
-                new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
+            try {
+                boolean isProductSaved = productBo.saveProduct(
+                        new ProductDto(
+                        txtCode.getText(),
+                        txtDescription.getText(),
+                        Double.parseDouble(txtUnitPrice.getText()),
+                        Integer.parseInt(txtQtyOnHand.getText()))
+                );
+
+                if (isProductSaved){
+                    new Alert(Alert.AlertType.INFORMATION,"Product Saved!").show();
+                    setTableData(searchText);
+                    setProductCode();
+                    clear();
+                }else {
+                    new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
             }
         }else {
-            for (Product p: Database.productTable
-            ) {
-                if (txtCode.getText().equalsIgnoreCase(p.getCode())){
-                    p.setDescription(txtDescription.getText());
-                    p.setUnitPrice(Double.parseDouble(txtUnitPrice.getText()));
-                    p.setQtyOnHand(Integer.parseInt(txtQtyOnHand.getText()));
+            try {
+                boolean isProductUpdated = productBo.updateProduct(
+                        new ProductDto(
+                                txtCode.getText(),
+                                txtDescription.getText(),
+                                Double.parseDouble(txtUnitPrice.getText()),
+                                Integer.parseInt(txtQtyOnHand.getText()))
+                );
+
+                if (isProductUpdated){
                     new Alert(Alert.AlertType.CONFIRMATION,"Product Details Updated!").show();
                     setTableData(searchText);
+                    setProductCode();
                     clear();
+                }else {
+                    new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
                 }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
             }
         }
+        txtDescription.requestFocus();
     }
 
     public void clearDataOnAction(ActionEvent actionEvent) {
         clear();
+        txtDescription.requestFocus();
     }
 
     private  void setProductCode(){
-        if(!Database.productTable.isEmpty()){
-            Product p = Database.productTable.get(Database.productTable.size()-1);
-            String id = p.getCode();
-            String dataArray[] = id.split("-");
-            id = dataArray[1];
-            int oldNum = Integer.parseInt(id);
-            oldNum++;
 
-            if (oldNum<9){
-                txtCode.setText("P-00"+oldNum);
-            }else if (oldNum<99){
-                txtCode.setText("P-0"+oldNum);
+        try{
+            String sql1 = "SELECT * FROM Product ORDER BY code DESC LIMIT 1";
+            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
+            ResultSet set = statement1.executeQuery();
+
+            if (set.next()) {
+                String lastPrimaryKey = set.getString(1);
+
+                String dataArray[] = lastPrimaryKey.split("-");  // ==> ["C","001"]
+                lastPrimaryKey = dataArray[1];     // "001"
+                int oldNum = Integer.parseInt(lastPrimaryKey);   // 1 => 00 remove
+                oldNum++;       // 2
+
+                if (oldNum<=9){
+                    txtCode.setText("P-00"+oldNum);
+                }else if (oldNum<=99){
+                    txtCode.setText("P-0"+oldNum);
+                }else {
+                    txtCode.setText("P-"+oldNum);
+                }
             }else {
-                txtCode.setText("P-"+oldNum);
+                txtCode.setText("P-001");
             }
-        }else {
-            txtCode.setText("P-001");
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
         }
     }
 
+    private boolean isNumeric(String string){
+        try {
+            Double.parseDouble(string);
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("Input String cannot be parsed to Integer.");
+        }
+        return false;
+    }
 }

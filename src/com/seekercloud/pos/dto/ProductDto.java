@@ -1,15 +1,15 @@
-package com.seekercloud.pos.model;
+package com.seekercloud.pos.dto;
 
-public class Product {
+public class ProductDto {
     private String code;
     private String description;
     private double unitPrice;
     private int qtyOnHand;
 
-    public Product() {
+    public ProductDto() {
     }
 
-    public Product(String code, String description, double unitPrice, int qtyOnHand) {
+    public ProductDto(String code, String description, double unitPrice, int qtyOnHand) {
         this.setCode(code);
         this.setDescription(description);
         this.setUnitPrice(unitPrice);

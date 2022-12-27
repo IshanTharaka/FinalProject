@@ -22,6 +22,11 @@ public class SignUpFormController {
     public JFXPasswordField txtRePassword;
 
     public void signUpOnAction(ActionEvent actionEvent) throws InterruptedException, IOException {
+        // check whether details are empty or not
+        if(txtFullName.getText().isEmpty() || txtEmail.getText().isEmpty() || txtContact.getText().isEmpty() || txtPassword.getText().isEmpty() || txtRePassword.getText().isEmpty()){
+            new Alert(Alert.AlertType.INFORMATION,"Please fill the all fields!").show();
+            return;
+        }
         // Check the password is matched?
         String realPwd = txtPassword.getText().trim();  // __NDF_ After trim() ==> NDF
         String matchPwd = txtRePassword.getText().trim();
@@ -67,7 +72,7 @@ public class SignUpFormController {
         Stage window= (Stage) signupFormContext.getScene().getWindow();
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
-
+        window.centerOnScreen();
     }
 
     public void alreadyHaveAnAccountOnAction(ActionEvent actionEvent) throws IOException {

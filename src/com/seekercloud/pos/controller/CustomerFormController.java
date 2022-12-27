@@ -1,8 +1,16 @@
 package com.seekercloud.pos.controller;
 
 import com.jfoenix.controls.JFXButton;
-import com.seekercloud.pos.db.Database;
-import com.seekercloud.pos.model.Customer;
+import com.seekercloud.pos.bo.BoFactory;
+import com.seekercloud.pos.bo.BoTypes;
+import com.seekercloud.pos.bo.custom.CustomerBo;
+import com.seekercloud.pos.dao.DaoFactory;
+import com.seekercloud.pos.dao.DaoTypes;
+import com.seekercloud.pos.dao.custom.CustomerDao;
+import com.seekercloud.pos.dao.custom.impl.CustomerDaoImpl;
+import com.seekercloud.pos.db.DBConnection;
+import com.seekercloud.pos.dto.CustomerDto;
+import com.seekercloud.pos.entity.Customer;
 import com.seekercloud.pos.view.tm.CustomerTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +23,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -35,6 +44,7 @@ public class CustomerFormController {
 
     private String searchText="";
 
+    private CustomerBo customerBo = BoFactory.getInstance().getBo(BoTypes.CUSTOMER);
     public void initialize(){
         setTableData(searchText);
         setCustomerID();
@@ -78,37 +88,66 @@ public class CustomerFormController {
             new Alert(Alert.AlertType.INFORMATION,"Please fill the all the details to save the customer!").show();
             return;
         }
-        Customer customer = new Customer(
-                txtID.getText(),
-                txtName.getText(),
-                txtAddress.getText(),
-                Double.parseDouble(txtSalary.getText())
-        );
 
-        if(btnSaveUpdate.getText().equalsIgnoreCase("Save Customer")){
-            // save
-            if (Database.customerTable.add(customer)){
-                new Alert(Alert.AlertType.CONFIRMATION,"Customer Saved!").show();
-                setTableData(searchText);
-                setCustomerID();
-                clear();
-            }else {
-                new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
-            }
-        }else {
-            for (Customer c: Database.customerTable
-                 ) {
-                if (txtID.getText().equalsIgnoreCase(c.getId())){
-                    c.setName(txtName.getText());
-                    c.setAddress(txtAddress.getText());
-                    c.setSalary(Double.parseDouble(txtSalary.getText()));
-                    new Alert(Alert.AlertType.CONFIRMATION,"Customer Details Updated!").show();
-                    setTableData(searchText);
-                    clear();
-                }
-            }
+        if (!isNumeric(txtSalary.getText())){
+            new Alert(Alert.AlertType.WARNING,"Salary must be a number!").show();
+            txtSalary.requestFocus();
+            return;
         }
 
+
+        if(btnSaveUpdate.getText().equalsIgnoreCase("Save Customer")){
+
+            try {
+                boolean isCustomerSaved = customerBo.saveCustomer(
+                        new CustomerDto(txtID.getText(),
+                                txtName.getText(),
+                                txtAddress.getText(),
+                                Double.parseDouble(txtSalary.getText()))
+                );
+                if (isCustomerSaved){
+                    new Alert(Alert.AlertType.CONFIRMATION,"Customer Saved!").show();
+                    setTableData(searchText);
+                    setCustomerID();
+                    clear();
+                }else {
+                    new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
+            }
+
+        }else {
+            try {
+                boolean isCustomerUpdated = customerBo.updateCustomer(
+                        new CustomerDto(txtID.getText(),
+                                txtName.getText(),
+                                txtAddress.getText(),
+                                Double.parseDouble(txtSalary.getText()))
+                );
+                if (isCustomerUpdated){
+                    new Alert(Alert.AlertType.CONFIRMATION,"Customer Details Updated!").show();
+                    setTableData(searchText);
+                    setCustomerID();
+                    clear();
+                }else {
+                    new Alert(Alert.AlertType.CONFIRMATION,"Try Again!").show();
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        txtName.requestFocus();
+    }
+
+    private boolean isNumeric(String string){
+        try {
+            Double.parseDouble(string);
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("Input String cannot be parsed to Integer.");
+        }
+        return false;
     }
 
     public void clear(){
@@ -121,40 +160,54 @@ public class CustomerFormController {
         txtName.clear();txtAddress.clear();txtSalary.clear();
     }
 
-    private void setTableData(String text){
-        text = text.toLowerCase();
-        ArrayList<Customer> customerList = Database.customerTable;
-        ObservableList<CustomerTM> obList = FXCollections.observableArrayList();
-        for (Customer c : customerList
-             ) {
-            if(c.getName().toLowerCase().contains(text) || c.getAddress().toLowerCase().contains(text)){
-                Button btn = new Button("Delete");
-                CustomerTM tm = new CustomerTM(c.getId(),c.getName(),c.getAddress(),c.getSalary(),btn);
-                obList.add(tm);
+    private void setTableData(String text){     // search customer
+        String searchText = "%"+text+"%";
+        try {
+            ObservableList<CustomerTM> obList = FXCollections.observableArrayList();
 
-                btn.setOnAction(event -> {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                            "Are you sure?",
-                            ButtonType.YES,ButtonType.NO);
-                    Optional<ButtonType> val = alert.showAndWait();
-                    if (val.get()==ButtonType.YES){
-                        Database.customerTable.remove(c);
-                        new Alert(Alert.AlertType.INFORMATION,"Customer Deleted!").show();
-                        setTableData(searchText);
-                        clear();
-                    }
-                });
+            ArrayList<CustomerDto> customerList = customerBo.searchCustomers(searchText);
+            for (CustomerDto c: customerList){
+                    Button btn = new Button("Delete");
+                    CustomerTM tm = new CustomerTM(
+                            c.getId(),
+                            c.getName(),
+                            c.getAddress(),
+                            c.getSalary(),
+                            btn);
+                    obList.add(tm);
+
+                    btn.setOnAction(event -> {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                                "Are you sure?",
+                                ButtonType.YES,ButtonType.NO);
+                        Optional<ButtonType> val = alert.showAndWait();
+                        if (val.get()==ButtonType.YES){
+                            try {
+                                if(customerBo.deleteCustomer(tm.getId())){
+                                    new Alert(Alert.AlertType.INFORMATION,"Customer Deleted!").show();
+                                    setTableData(searchText);
+                                    clear();
+                                }else {
+                                    new Alert(Alert.AlertType.WARNING,"Try Again!").show();
+                                }
+                            } catch (ClassNotFoundException | SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
             }
-        }
-        tblCustomer.setItems(obList);
+            tblCustomer.setItems(obList);
 
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setUI(String location,String title) throws IOException {
         Stage window= (Stage) customerFormContext.getScene().getWindow();
         window.setTitle(title);
         window.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/"+location+".fxml"))));
-
+        window.centerOnScreen();
     }
 
     private  void setCustomerID(){
@@ -165,31 +218,41 @@ public class CustomerFormController {
         // concat the character again to the incremented number (C-002)
         // set customer ID
 
-        if(!Database.customerTable.isEmpty()){
-            Customer c = Database.customerTable.get(Database.customerTable.size()-1);
-            String id = c.getId();
-            String dataArray[] = id.split("-");  // ==> ["C","001"]
-            id = dataArray[1];     // "001"
-            int oldNum = Integer.parseInt(id);   // 1 => 00 remove
-            oldNum++;       // 2
+        try{
+            String sql1 = "SELECT * FROM Customer ORDER BY id DESC LIMIT 1";
+            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
+            ResultSet set = statement1.executeQuery();
 
-            if (oldNum<9){
-                txtID.setText("C-00"+oldNum);
-            }else if (oldNum<99){
-                txtID.setText("C-0"+oldNum);
+            if (set.next()) {
+                String lastPrimaryKey = set.getString(1);
+
+                String dataArray[] = lastPrimaryKey.split("-");  // ==> ["C","001"]
+                lastPrimaryKey = dataArray[1];     // "001"
+                int oldNum = Integer.parseInt(lastPrimaryKey);   // 1 => 00 remove
+                oldNum++;       // 2
+
+                if (oldNum<=9){
+                    txtID.setText("C-00"+oldNum);
+                }else if (oldNum<=99){
+                    txtID.setText("C-0"+oldNum);
+                }else {
+                    txtID.setText("C-"+oldNum);
+                }
             }else {
-                txtID.setText("C-"+oldNum);
+                txtID.setText("C-001");
             }
-        }else {
-            txtID.setText("C-001");
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
         }
     }
 
     public void clearDataOnAction(ActionEvent actionEvent) {
         clear();
+        txtName.requestFocus();
     }
 
     public void newCustomerOnAction(ActionEvent actionEvent) {
         clear();
+        txtName.requestFocus();
     }
 }

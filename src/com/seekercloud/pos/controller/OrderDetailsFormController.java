@@ -1,10 +1,7 @@
 package com.seekercloud.pos.controller;
 
 import com.jfoenix.controls.JFXTextField;
-import com.seekercloud.pos.db.Database;
-import com.seekercloud.pos.model.CartItem;
-import com.seekercloud.pos.model.Customer;
-import com.seekercloud.pos.model.Order;
+import com.seekercloud.pos.db.DBConnection;
 import com.seekercloud.pos.view.tm.ProductDetailsTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,8 +12,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import javax.xml.crypto.Data;
-import java.text.SimpleDateFormat;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class OrderDetailsFormController {
     public AnchorPane orderDetailsContext;
@@ -45,36 +43,46 @@ public class OrderDetailsFormController {
             return;
         }
 
-        Order o = Database.orderTable.stream().filter(e -> e.getOrderID().equals(orderID))
-                .findFirst().orElse(null);
+        try{
+            String sql = "SELECT o.orderId,d.productCode,d.orderID,d.unitPrice,d.qty,o.total,o.customer,o.placeDate" +
+                    " FROM `Order` o INNER JOIN `Order Details` d ON o.orderId=d.orderID AND o.orderId=?";
+            PreparedStatement statement = DBConnection.getInstance().getConnection().prepareStatement(sql);
+            statement.setString(1,orderID);
+            ResultSet set = statement.executeQuery();
 
-        if (o!=null){
-            Customer c = Database.customerTable.stream().filter(e -> e.getId().equals(o.getCustomer()))
-                    .findFirst().orElse(null);
 
-            if (c!=null){
-                txtID.setText(c.getId());
-                txtName.setText(c.getName());
-                txtAddress.setText(c.getAddress());
-                txtSalary.setText(String.valueOf(c.getSalary()));
 
-                txtOrderID.setText(o.getOrderID());
-                txtDate.setText(new SimpleDateFormat("yyyy-MM-dd").format(o.getPlaceDate()));
-                txtCost.setText(String.valueOf(o.getTotal()));
+            ObservableList<ProductDetailsTM> tmList = FXCollections.observableArrayList();
 
-                ObservableList<ProductDetailsTM> tmList = FXCollections.observableArrayList();
-                for (CartItem items: o.getItems()
-                     ) {
-                    tmList.add(new ProductDetailsTM(items.getCode(),
-                            items.getUnitPrice(),items.getQty(),(items.getQty()*items.getUnitPrice())));
+            while (set.next()){
+                double tempUnitPrice = set.getDouble(4);
+                int tempQtyOnHand = set.getInt(5);
+                double tempTotal = tempQtyOnHand * tempUnitPrice;
+                ProductDetailsTM tm = new ProductDetailsTM(set.getString(2),
+                        set.getDouble(4),
+                        set.getInt(5),
+                        tempTotal);
+                tmList.add(tm);
+
+                String sql1 = "SELECT * FROM Customer WHERE id=?";
+                PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
+                statement1.setString(1, set.getString(7));
+                ResultSet resultSet = statement1.executeQuery();
+
+                if (resultSet.next()){
+                    txtID.setText(resultSet.getString(1));
+                    txtName.setText(resultSet.getString(2));
+                    txtAddress.setText(resultSet.getString(3));
+                    txtSalary.setText(String.valueOf(resultSet.getDouble(4)));
                 }
-                tblOrders.setItems(tmList);
-            }else {
-                removeUI();
-            }
 
-        }else {
-            removeUI();
+                txtOrderID.setText(set.getString(1));
+                txtDate.setText(set.getString(8));
+                txtCost.setText(String.valueOf(set.getDouble(6)));
+            }
+            tblOrders.setItems(tmList);
+        }catch (SQLException | ClassNotFoundException e){
+            e.printStackTrace();
         }
     }
 
