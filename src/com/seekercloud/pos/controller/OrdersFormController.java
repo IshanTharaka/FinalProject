@@ -1,5 +1,6 @@
 package com.seekercloud.pos.controller;
 
+import com.jfoenix.controls.JFXDatePicker;
 import com.seekercloud.pos.db.Database;
 import com.seekercloud.pos.model.Order;
 import com.seekercloud.pos.view.tm.OrdersDetailsTM;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class OrdersFormController {
@@ -26,6 +28,8 @@ public class OrdersFormController {
     public TableColumn colTotalCost;
     public TableColumn colCustomerID;
     public TableColumn colOption;
+    public JFXDatePicker dtFrom;
+    public JFXDatePicker dtTo;
 
     public void initialize(){
         colOrderID.setCellValueFactory(new PropertyValueFactory<>("orderID"));
@@ -35,7 +39,7 @@ public class OrdersFormController {
         colOption.setCellValueFactory(new PropertyValueFactory<>("btn"));
 
         loadData();
-
+        shortAccordingToDate();
          //=======================
         tblOrders.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue!=null){
@@ -50,6 +54,11 @@ public class OrdersFormController {
 
     }
 
+    private void shortAccordingToDate(){
+        LocalDate value = dtFrom.getValue();
+        System.out.println(value);
+//        System.out.println(dtTo.getScene());
+    }
     private void openDetailsUI(OrdersDetailsTM value) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../view/OrderDetailsForm.fxml"));
         Parent parent = fxmlLoader.load();
@@ -97,4 +106,7 @@ public class OrdersFormController {
 
     }
 
+    public void checkBtn(ActionEvent actionEvent) {
+        shortAccordingToDate();
+    }
 }

@@ -123,6 +123,7 @@ public class ProductFormController {
 
     public void newProductOnAction(ActionEvent actionEvent) {
         clear();
+        txtDescription.requestFocus();
     }
 
     public void saveProductOnAction(ActionEvent actionEvent) {
@@ -130,6 +131,17 @@ public class ProductFormController {
             new Alert(Alert.AlertType.INFORMATION,"Please fill the all the details to save the product!").show();
             return;
         }
+
+        if (!isNumeric(txtUnitPrice.getText())){
+            new Alert(Alert.AlertType.WARNING,"Unit price must be a number!").show();
+            txtUnitPrice.requestFocus();
+            return;
+        } else if (!isNumeric(txtQtyOnHand.getText())) {
+            new Alert(Alert.AlertType.WARNING,"QTY on hand must be a number!").show();
+            txtQtyOnHand.requestFocus();
+            return;
+        }
+
         Product product = new Product(
                 txtCode.getText(),
                 txtDescription.getText(),
@@ -140,7 +152,7 @@ public class ProductFormController {
         if(btnSaveUpdate.getText().equalsIgnoreCase("Save Product")){
             // save
             if (Database.productTable.add(product)){
-                new Alert(Alert.AlertType.CONFIRMATION,"Product Saved!").show();
+                new Alert(Alert.AlertType.INFORMATION,"Product Saved!").show();
                 setTableData(searchText);
                 setProductCode();
                 clear();
@@ -160,10 +172,12 @@ public class ProductFormController {
                 }
             }
         }
+        txtDescription.requestFocus();
     }
 
     public void clearDataOnAction(ActionEvent actionEvent) {
         clear();
+        txtDescription.requestFocus();
     }
 
     private  void setProductCode(){
@@ -187,4 +201,13 @@ public class ProductFormController {
         }
     }
 
+    private boolean isNumeric(String string){
+        try {
+            Double.parseDouble(string);
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("Input String cannot be parsed to Integer.");
+        }
+        return false;
+    }
 }

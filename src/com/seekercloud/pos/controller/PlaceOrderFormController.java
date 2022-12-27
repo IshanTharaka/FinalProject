@@ -40,7 +40,6 @@ public class PlaceOrderFormController {
     public TextField txtOrderID;
     public TextField txtOrderCount;
     public TextField txtOrderDate;
-    public TextField txtOrderCost;
     public TableView<CartTM> tblCart;
     public TableColumn colCode;
     public TableColumn colDescription;
@@ -49,6 +48,7 @@ public class PlaceOrderFormController {
     public TableColumn colQty;
     public TableColumn colTotal;
     public JFXButton addToCartBtn;
+    public Label lblTotalCost;
 
     public void initialize(){
         colCode.setCellValueFactory(new PropertyValueFactory<>("code"));
@@ -138,7 +138,17 @@ public class PlaceOrderFormController {
 
     ObservableList<CartTM> tmList = FXCollections.observableArrayList();
     public void addToCart(ActionEvent actionEvent) {
-        int qty = Integer.valueOf(txtQty.getText());
+        if (!checkCustomerAndProduct()){
+            return;
+        }
+
+        if (!isNumeric(txtQty.getText())){
+            new Alert(Alert.AlertType.WARNING,"Quantity must be a number!").show();
+            txtQty.requestFocus();
+            return;
+        }
+
+        int qty = Integer.parseInt(txtQty.getText());
         double unitPrice = Double.parseDouble(txtUnitPrice.getText());
         double total = qty*unitPrice;
 
@@ -177,6 +187,26 @@ public class PlaceOrderFormController {
         clearFields();
     }
 
+    private boolean isNumeric(String string){
+        try {
+            Integer.parseInt(string);
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("Input String cannot be parsed to Integer.");
+        }
+        return false;
+    }
+    private boolean checkCustomerAndProduct() {
+        if (txtName.getText().isEmpty()){
+            new Alert(Alert.AlertType.INFORMATION,"Please select the customer or otherwise add a new customer!").show();
+            return false;
+        }else if (txtDescription.getText().isEmpty()){
+            new Alert(Alert.AlertType.INFORMATION,"Please select the products with required quantities!").show();
+            return false;
+        }
+        return true;
+    }
+
     private boolean checkQTY(int qty){
 //        if (Integer.parseInt(txtQtyOnHand.getText())<qty){
 //            new Alert(Alert.AlertType.WARNING,"Invalid Quantity!").show();
@@ -208,7 +238,7 @@ public class PlaceOrderFormController {
              ) {
             cost+=tm.getTotal();
         }
-        txtOrderCost.setText(String.valueOf(cost));
+        lblTotalCost.setText(String.valueOf(cost));
         txtOrderCount.setText(String.valueOf(tmList.size()));
     }
     public void placeOrderOnAction(ActionEvent actionEvent) {
@@ -229,7 +259,6 @@ public class PlaceOrderFormController {
         txtAddress.clear();
         txtSalary.clear();
         txtOrderCount.setText("Item Count");
-        txtOrderCost.setText("Total Cost");
 
         tmList.clear();
         tblCart.refresh();
@@ -246,7 +275,7 @@ public class PlaceOrderFormController {
             items.add(new CartItem(tm.getCode(),tm.getQty(),tm.getUnitPrice()));
         }
         // create order object
-        Order order = new Order(txtOrderID.getText(),new Date(),Double.parseDouble(txtOrderCost.getText()),cmdCustomerID.getValue(),items);
+        Order order = new Order(txtOrderID.getText(),new Date(),Double.parseDouble(lblTotalCost.getText()),cmdCustomerID.getValue(),items);
         // save order
         Database.orderTable.add(order);
         // update QTY s

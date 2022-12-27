@@ -78,6 +78,13 @@ public class CustomerFormController {
             new Alert(Alert.AlertType.INFORMATION,"Please fill the all the details to save the customer!").show();
             return;
         }
+
+        if (!isNumeric(txtSalary.getText())){
+            new Alert(Alert.AlertType.WARNING,"Salary must be a number!").show();
+            txtSalary.requestFocus();
+            return;
+        }
+
         Customer customer = new Customer(
                 txtID.getText(),
                 txtName.getText(),
@@ -97,7 +104,7 @@ public class CustomerFormController {
             }
         }else {
             for (Customer c: Database.customerTable
-                 ) {
+            ) {
                 if (txtID.getText().equalsIgnoreCase(c.getId())){
                     c.setName(txtName.getText());
                     c.setAddress(txtAddress.getText());
@@ -108,7 +115,17 @@ public class CustomerFormController {
                 }
             }
         }
+        txtName.requestFocus();
+    }
 
+    private boolean isNumeric(String string){
+        try {
+            Double.parseDouble(string);
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("Input String cannot be parsed to Integer.");
+        }
+        return false;
     }
 
     public void clear(){
@@ -187,9 +204,11 @@ public class CustomerFormController {
 
     public void clearDataOnAction(ActionEvent actionEvent) {
         clear();
+        txtName.requestFocus();
     }
 
     public void newCustomerOnAction(ActionEvent actionEvent) {
         clear();
+        txtName.requestFocus();
     }
 }

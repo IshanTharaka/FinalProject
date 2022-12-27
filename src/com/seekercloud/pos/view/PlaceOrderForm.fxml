@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane fx:id="placeOrderContext" prefHeight="850.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.seekercloud.pos.controller.PlaceOrderFormController">
    <children>
       <JFXButton layoutX="27.0" layoutY="28.0" onAction="#backToHomeOnAction" style="-fx-background-color: #27AE60;" text="Back to Home" textFill="WHITE">
@@ -31,22 +30,17 @@
          </cursor>
       </JFXButton>
       <Separator layoutX="350.0" layoutY="52.0" prefHeight="0.0" prefWidth="918.0" />
-      <TextField fx:id="txtOrderID" disable="true" layoutX="27.0" layoutY="105.0" prefHeight="44.0" prefWidth="243.0" promptText="Order ID">
+      <TextField fx:id="txtOrderID" disable="true" layoutX="119.0" layoutY="105.0" prefHeight="44.0" prefWidth="120.0" promptText="Order ID">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
       </TextField>
-      <TextField fx:id="txtOrderCount" disable="true" layoutX="1046.0" layoutY="105.0" prefHeight="44.0" prefWidth="227.0" promptText="Item Count">
+      <TextField fx:id="txtOrderCount" disable="true" layoutX="763.0" layoutY="105.0" prefHeight="44.0" prefWidth="148.0" promptText="Item Count">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
       </TextField>
-      <TextField fx:id="txtOrderDate" disable="true" layoutX="334.0" layoutY="105.0" prefHeight="44.0" prefWidth="345.0" promptText="Date">
-         <font>
-            <Font name="System Bold" size="15.0" />
-         </font>
-      </TextField>
-      <TextField fx:id="txtOrderCost" disable="true" layoutX="744.0" layoutY="105.0" prefHeight="44.0" prefWidth="243.0" promptText="Total Cost">
+      <TextField fx:id="txtOrderDate" disable="true" layoutX="397.0" layoutY="105.0" prefHeight="44.0" prefWidth="181.0" promptText="Date">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
@@ -131,5 +125,30 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </TextField>
+      <Label layoutX="29.0" layoutY="105.0" prefHeight="44.0" prefWidth="99.0" text="Order ID : ">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="333.0" layoutY="105.0" prefHeight="44.0" prefWidth="72.0" text="Date :">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="649.0" layoutY="105.0" prefHeight="44.0" prefWidth="113.0" text="Item Count : ">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="970.0" layoutY="105.0" prefHeight="44.0" prefWidth="113.0" text="Total Cost :" textFill="#ee0000">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblTotalCost" layoutX="1084.0" layoutY="105.0" prefHeight="44.0" prefWidth="190.0">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
