@@ -1,19 +1,21 @@
-package com.seekercloud.pos.model;
+package com.seekercloud.pos.dto;
+
+import com.seekercloud.pos.dto.CartItemDto;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Order {
+public class OrderDto {
     private String orderID;
     private Date placeDate;
     private double total;
     private String customer;
-    private ArrayList<CartItem> items;
+    private ArrayList<CartItemDto> items;
 
-    public Order() {
+    public OrderDto() {
     }
 
-    public Order(String orderID, Date placeDate, double total, String customer, ArrayList<CartItem> items) {
+    public OrderDto(String orderID, Date placeDate, double total, String customer, ArrayList<CartItemDto> items) {
         this.orderID = orderID;
         this.placeDate = placeDate;
         this.total = total;
@@ -53,17 +55,17 @@ public class Order {
         this.customer = customer;
     }
 
-    public ArrayList<CartItem> getItems() {
+    public ArrayList<CartItemDto> getItems() {
         return items;
     }
 
-    public void setItems(ArrayList<CartItem> items) {
+    public void setItems(ArrayList<CartItemDto> items) {
         this.items = items;
     }
 
     @Override
     public String toString() {
-        return "Order{" +
+        return "OrderIDao{" +
                 "orderID='" + orderID + '\'' +
                 ", placeDate=" + placeDate +
                 ", total=" + total +

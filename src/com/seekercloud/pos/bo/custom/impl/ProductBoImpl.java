@@ -7,6 +7,7 @@ import com.seekercloud.pos.dao.custom.ProductDao;
 import com.seekercloud.pos.dto.ProductDto;
 import com.seekercloud.pos.entity.Product;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -42,5 +43,20 @@ public class ProductBoImpl implements ProductBo {
             dtoList.add(new ProductDto(p.getCode(),p.getDescription(),p.getUnitPrice(),p.getQtyOnHand()));
         }
         return dtoList;
+    }
+
+    @Override
+    public ResultSet getLastID() throws SQLException, ClassNotFoundException {
+        return dao.getLastID();
+    }
+
+    @Override
+    public ArrayList<Product> getProductDetails(String id) throws SQLException, ClassNotFoundException {
+        return dao.getProductDetails(id);
+    }
+
+    @Override
+    public ArrayList<String> getProductIDs() throws SQLException, ClassNotFoundException {
+        return dao.getProductIDs();
     }
 }

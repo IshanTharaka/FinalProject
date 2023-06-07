@@ -1,6 +1,9 @@
 package com.seekercloud.pos.dao;
 
+import com.seekercloud.pos.dao.custom.CartItemDao;
+import com.seekercloud.pos.dao.custom.impl.CartItemDaoImpl;
 import com.seekercloud.pos.dao.custom.impl.CustomerDaoImpl;
+import com.seekercloud.pos.dao.custom.impl.OrderDaoImpl;
 import com.seekercloud.pos.dao.custom.impl.ProductDaoImpl;
 
 public class DaoFactory {
@@ -17,6 +20,10 @@ public class DaoFactory {
                 return (T) new CustomerDaoImpl();
             case PRODUCT:
                 return (T) new ProductDaoImpl();
+            case ORDER:
+                return (T) new OrderDaoImpl();
+            case CARTITEM:
+                return (T) new CartItemDaoImpl();
             default:
                 return null;
         }

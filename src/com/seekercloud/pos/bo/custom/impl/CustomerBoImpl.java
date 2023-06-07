@@ -7,6 +7,7 @@ import com.seekercloud.pos.dao.custom.CustomerDao;
 import com.seekercloud.pos.dto.CustomerDto;
 import com.seekercloud.pos.entity.Customer;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -42,5 +43,27 @@ public class CustomerBoImpl implements CustomerBo {
             dtoList.add(new CustomerDto(c.getId(),c.getName(),c.getAddress(),c.getSalary()));
         }
         return dtoList;
+    }
+
+    @Override
+    public ResultSet getLastID() throws SQLException, ClassNotFoundException {
+        return dao.getLastID();
+    }
+
+    @Override
+    public ArrayList<CustomerDto> getCustomerDetails(String id) throws SQLException, ClassNotFoundException {
+        ArrayList<Customer> entities = dao.getCustomerDetails(id);
+        ArrayList<CustomerDto> dtoList = new ArrayList<>();
+
+        for (Customer c:
+                entities) {
+            dtoList.add(new CustomerDto(c.getId(),c.getName(),c.getAddress(),c.getSalary()));
+        }
+        return dtoList;
+    }
+
+    @Override
+    public ArrayList<String> getCustomerIDs() throws SQLException, ClassNotFoundException {
+        return dao.getCustomerIDs();
     }
 }

@@ -1,9 +1,16 @@
 package com.seekercloud.pos.controller;
 
 import com.jfoenix.controls.JFXButton;
-import com.seekercloud.pos.db.DBConnection;
-import com.seekercloud.pos.model.CartItem;
-import com.seekercloud.pos.model.Order;
+import com.seekercloud.pos.bo.BoFactory;
+import com.seekercloud.pos.bo.BoTypes;
+import com.seekercloud.pos.bo.custom.CartItemBo;
+import com.seekercloud.pos.bo.custom.CustomerBo;
+import com.seekercloud.pos.bo.custom.OrderBo;
+import com.seekercloud.pos.bo.custom.ProductBo;
+import com.seekercloud.pos.dto.CartItemDto;
+import com.seekercloud.pos.dto.CustomerDto;
+import com.seekercloud.pos.dto.OrderDto;
+import com.seekercloud.pos.entity.Product;
 import com.seekercloud.pos.view.tm.CartTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,7 +53,12 @@ public class PlaceOrderFormController {
     public JFXButton addToCartBtn;
     public Label lblTotalCost;
 
-    public void initialize(){
+    private OrderBo orderBo = BoFactory.getInstance().getBo(BoTypes.ORDER);
+    private CustomerBo customerBo = BoFactory.getInstance().getBo(BoTypes.CUSTOMER);
+    private ProductBo productBo = BoFactory.getInstance().getBo(BoTypes.PRODUCT);
+    private CartItemBo cartItemBo = BoFactory.getInstance().getBo(BoTypes.CARTITEM);
+
+        public void initialize(){
         colCode.setCellValueFactory(new PropertyValueFactory<>("code"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         colUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
@@ -79,29 +91,27 @@ public class PlaceOrderFormController {
         txtOrderDate.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
     }
 
-    private void setProductData(String code) {
+    private void setProductData(String id) {
+        try{
+            ArrayList<Product> resultSet = productBo.getProductDetails(id);
 
-            try{
-                String sql = "SELECT * FROM Product WHERE code=?";
-                PreparedStatement statement = DBConnection.getInstance().getConnection().prepareStatement(sql);
-                statement.setString(1,cmbProductsCode.getValue());
-                ResultSet resultSet = statement.executeQuery();
-
-                if (resultSet.next()){
-                    txtDescription.setText(resultSet.getString(2));
-                    txtUnitPrice.setText(String.valueOf(resultSet.getDouble(3)));
-                    txtQtyOnHand.setText(String.valueOf(resultSet.getInt(4)));
-                }
-
-                if(isQtyZero()){
-                    new Alert(Alert.AlertType.WARNING,"Quantity on hand is zero. Please select another product!").show();
-                    txtQty.setEditable(false);
-                }
-                txtQty.setEditable(true);
-
-            }catch (ClassNotFoundException | SQLException e){
-                e.printStackTrace();
+            for (Product product :
+                    resultSet) {
+                txtDescription.setText(product.getDescription());
+                txtUnitPrice.setText(String.valueOf(product.getUnitPrice()));
+                txtQtyOnHand.setText(String.valueOf(product.getQtyOnHand()));
             }
+
+            if(isQtyZero()){
+                new Alert(Alert.AlertType.WARNING,"Quantity on hand is zero. Please select another product!").show();
+                txtQty.setEditable(false);
+            }
+            txtQty.setEditable(true);
+
+        }catch (ClassNotFoundException | SQLException e){
+            e.printStackTrace();
+        }
+
     }
 
     private boolean isQtyZero(){
@@ -119,15 +129,13 @@ public class PlaceOrderFormController {
 
     private void setCustomerData(String id) {
         try{
-            String sql = "SELECT * FROM Customer WHERE id=?";
-            PreparedStatement statement = DBConnection.getInstance().getConnection().prepareStatement(sql);
-            statement.setString(1,cmdCustomerID.getValue());
-            ResultSet resultSet = statement.executeQuery();
+            ArrayList<CustomerDto> resultSet = customerBo.getCustomerDetails(id);
 
-            if (resultSet.next()){
-                txtName.setText(resultSet.getString(2));
-                txtAddress.setText(resultSet.getString(3));
-                txtSalary.setText(String.valueOf(resultSet.getDouble(4)));
+            for (CustomerDto customer:
+                 resultSet) {
+                txtName.setText(customer.getName());
+                txtAddress.setText(customer.getAddress());
+                txtSalary.setText(String.valueOf(customer.getSalary()));
             }
         }catch (ClassNotFoundException | SQLException e){
             e.printStackTrace();
@@ -136,14 +144,7 @@ public class PlaceOrderFormController {
 
     private void loadCustomerIDs() {
         try{
-            String sql2 = "SELECT id FROM Customer";
-            PreparedStatement statement2 = DBConnection.getInstance().getConnection().prepareStatement(sql2);
-            ResultSet resultSet = statement2.executeQuery();
-
-            ArrayList<String> idList = new ArrayList<>();
-            while (resultSet.next()){
-                idList.add(resultSet.getString(1));
-            }
+            ArrayList<String> idList = customerBo.getCustomerIDs();
             ObservableList<String> obList = FXCollections.observableArrayList(idList);
             cmdCustomerID.setItems(obList);
         }catch (ClassNotFoundException | SQLException e){
@@ -154,14 +155,7 @@ public class PlaceOrderFormController {
     private void loadProductCodes() {
 
         try{
-            String sql1 = "SELECT code FROM Product";
-            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-            ResultSet resultSet = statement1.executeQuery();
-
-            ArrayList<String> idList = new ArrayList<>();
-            while (resultSet.next()){
-                idList.add(resultSet.getString(1));
-            }
+            ArrayList<String> idList = productBo.getProductIDs();
             ObservableList<String> obList = FXCollections.observableArrayList(idList);
             cmbProductsCode.setItems(obList);
         }catch (ClassNotFoundException | SQLException e){
@@ -264,10 +258,7 @@ public class PlaceOrderFormController {
 
     private boolean checkQTY(int qty){
         try {
-            String sql1 = "SELECT qtyOnHand FROM Product WHERE code=?";
-            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-            statement1.setString(1,cmbProductsCode.getValue());
-            ResultSet set = statement1.executeQuery();
+            ResultSet set = orderBo.getQty(cmbProductsCode.getValue());
 
             if(set.next()){
                 int tempQty = set.getInt(1);
@@ -339,66 +330,57 @@ public class PlaceOrderFormController {
             return;
         }
         // creates item array list [all cart data]
-        ArrayList<CartItem> items = new ArrayList<>();
+        ArrayList<CartItemDto> items = new ArrayList<>();
         for (CartTM tm : tmList
         ) {
-            items.add(new CartItem(tm.getCode(),tm.getQty(),tm.getUnitPrice()));
+            items.add(new CartItemDto(tm.getCode(),tm.getQty(),tm.getUnitPrice()));
         }
         // create order object
-        Order order = new Order(txtOrderID.getText(),new Date(),Double.parseDouble(lblTotalCost.getText()),cmdCustomerID.getValue(),items);
+        OrderDto order = new OrderDto(txtOrderID.getText(),new Date(),Double.parseDouble(lblTotalCost.getText()),cmdCustomerID.getValue(),items);
         // save order
 
-        Connection con = null;
+        //Connection con = null;
 
         try {
-            con = DBConnection.getInstance().getConnection();
-            con.setAutoCommit(false);
-            String sql1 = "INSERT `Order` VALUES(?,?,?,?)";
-            PreparedStatement statement1 = con.prepareStatement(sql1);
-            statement1.setString(1,order.getOrderID());
-            statement1.setString(2,txtOrderDate.getText());
-            statement1.setDouble(3,order.getTotal());
-            statement1.setString(4,order.getCustomer());
+//            con = DBConnection.getInstance().getConnection();
+//            con.setAutoCommit(false);
+//            PreparedStatement statement1 = con.prepareStatement(sql1);
 
-            boolean isOrderSaved = statement1.executeUpdate()>0;
+
+            boolean isOrderSaved = orderBo.placeOrder(order,txtOrderDate.getText());
 
             if (isOrderSaved){
                 boolean isAllUpdated = manageQty(items);
                 if (isAllUpdated){
-                    con.commit();
-                    new Alert(Alert.AlertType.INFORMATION,"Order Placed!").show();
+//                    con.commit();
+                    new Alert(Alert.AlertType.INFORMATION,"Order is Placed!").show();
                     generateOrderID();
                     setFreshUI();
                 }
                 else {
-                    con.setAutoCommit(true);
-                    con.rollback();
+//                    con.setAutoCommit(true);
+//                    con.rollback();
                     new Alert(Alert.AlertType.WARNING,"Try Again!").show();
                 }
             }else {
-                con.setAutoCommit(true);
-                con.rollback();
+//                con.setAutoCommit(true);
+//                con.rollback();
                 new Alert(Alert.AlertType.WARNING,"Try Again!").show();
             }
 
         }catch (SQLException | ClassNotFoundException e){
             e.printStackTrace();
-        }finally {
-            con.setAutoCommit(true);
         }
+//        finally {
+//            con.setAutoCommit(true);
+//        }
     }
-    private boolean manageQty(ArrayList<CartItem> items){
+    private boolean manageQty(ArrayList<CartItemDto> items){
         try {
-            for (CartItem i : items
+            for (CartItemDto i : items
             ) {
-                String sql1 = "INSERT `Order Details` VALUES(?,?,?,?)";
-                PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-                statement1.setString(1,i.getCode());
-                statement1.setString(2,txtOrderID.getText());
-                statement1.setDouble(3,i.getUnitPrice());
-                statement1.setInt(4,i.getQty());
-
-                boolean isOrderDetailsSaved = statement1.executeUpdate()>0;
+                String orderID = txtOrderID.getText();
+                boolean isOrderDetailsSaved = cartItemBo.save( i,orderID);
 
                 if (isOrderDetailsSaved){
                     boolean isQtyUpdated = update(i);
@@ -417,13 +399,9 @@ public class PlaceOrderFormController {
         return true;
     }
 
-    private boolean update(CartItem i) {
+    private boolean update(CartItemDto i) {
         try {
-            String sql1 = "UPDATE Product SET qtyOnHand=(qtyOnHand-?) WHERE code=?";
-            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-            statement1.setInt(1,i.getQty());
-            statement1.setString(2,i.getCode());
-            return statement1.executeUpdate()>0;
+            return cartItemBo.update(i);
         }catch (SQLException | ClassNotFoundException e){
             e.printStackTrace();
             return false;
@@ -432,14 +410,11 @@ public class PlaceOrderFormController {
     private void generateOrderID() {
 
         try {
-            String sql1 = "SELECT * FROM `Order` ORDER BY orderId DESC LIMIT 1";   // 10 not working   (UNSIGNED)
-            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-            ResultSet set = statement1.executeQuery();
+            ResultSet lastID = orderBo.getLastOrderID();
 
-            if (set.next()){
-                String id = set.getString(1);
+            if (lastID.next()){
+                String id = lastID.getString(1);
                 String dataArray[] = id.split("[a-zA-Z]");   // A001    b001
-
                 id = dataArray[1];
                 int oldNum = Integer.parseInt(id);
                 oldNum++;

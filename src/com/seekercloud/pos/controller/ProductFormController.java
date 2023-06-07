@@ -7,10 +7,7 @@ import com.seekercloud.pos.bo.custom.ProductBo;
 import com.seekercloud.pos.dao.DaoFactory;
 import com.seekercloud.pos.dao.DaoTypes;
 import com.seekercloud.pos.dao.custom.ProductDao;
-import com.seekercloud.pos.dao.custom.impl.ProductDaoImpl;
-import com.seekercloud.pos.db.DBConnection;
 import com.seekercloud.pos.dto.ProductDto;
-import com.seekercloud.pos.entity.Product;
 import com.seekercloud.pos.view.tm.ProductTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -221,9 +218,7 @@ public class ProductFormController {
     private  void setProductCode(){
 
         try{
-            String sql1 = "SELECT * FROM Product ORDER BY code DESC LIMIT 1";
-            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-            ResultSet set = statement1.executeQuery();
+            ResultSet set = productBo.getLastID();
 
             if (set.next()) {
                 String lastPrimaryKey = set.getString(1);

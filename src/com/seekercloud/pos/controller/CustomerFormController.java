@@ -7,10 +7,7 @@ import com.seekercloud.pos.bo.custom.CustomerBo;
 import com.seekercloud.pos.dao.DaoFactory;
 import com.seekercloud.pos.dao.DaoTypes;
 import com.seekercloud.pos.dao.custom.CustomerDao;
-import com.seekercloud.pos.dao.custom.impl.CustomerDaoImpl;
-import com.seekercloud.pos.db.DBConnection;
 import com.seekercloud.pos.dto.CustomerDto;
-import com.seekercloud.pos.entity.Customer;
 import com.seekercloud.pos.view.tm.CustomerTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -219,9 +216,7 @@ public class CustomerFormController {
         // set customer ID
 
         try{
-            String sql1 = "SELECT * FROM Customer ORDER BY id DESC LIMIT 1";
-            PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-            ResultSet set = statement1.executeQuery();
+            ResultSet set = customerBo.getLastID();
 
             if (set.next()) {
                 String lastPrimaryKey = set.getString(1);

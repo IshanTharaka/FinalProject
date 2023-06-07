@@ -1,7 +1,13 @@
 package com.seekercloud.pos.controller;
 
 import com.jfoenix.controls.JFXDatePicker;
-import com.seekercloud.pos.db.DBConnection;
+import com.seekercloud.pos.bo.BoFactory;
+import com.seekercloud.pos.bo.BoTypes;
+import com.seekercloud.pos.bo.custom.CustomerBo;
+import com.seekercloud.pos.bo.custom.OrderBo;
+import com.seekercloud.pos.dao.DaoFactory;
+import com.seekercloud.pos.dao.DaoTypes;
+import com.seekercloud.pos.dao.custom.OrderDao;
 import com.seekercloud.pos.view.tm.OrdersDetailsTM;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,10 +21,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.Optional;
 
 public class OrdersFormController {
@@ -31,6 +35,7 @@ public class OrdersFormController {
     public TableColumn colOption;
     public JFXDatePicker dtFrom;
     public JFXDatePicker dtTo;
+    private OrderBo orderBo = BoFactory.getInstance().getBo(BoTypes.ORDER);
 
     public void initialize(){
 
@@ -78,9 +83,7 @@ public class OrdersFormController {
 //
 //        }
         try {
-            String sql = "SELECT * FROM `Order`";
-            PreparedStatement statement = DBConnection.getInstance().getConnection().prepareStatement(sql);
-            ResultSet set = statement.executeQuery();
+            ResultSet set = orderBo.loadOrderDetailsTable();
 
             ObservableList<OrdersDetailsTM> tmList = FXCollections.observableArrayList();
 
@@ -100,12 +103,8 @@ public class OrdersFormController {
                 Optional<ButtonType> val = alert.showAndWait();
                 if (val.get()==ButtonType.YES){
                     try {
-                        String sql1 = "DELETE FROM `Order` WHERE orderId=?";
-                        PreparedStatement statement1 = DBConnection.getInstance().getConnection().prepareStatement(sql1);
-                        statement1.setString(1,tm.getOrderID());
-
-                        if(statement1.executeUpdate()>0){
-                            new Alert(Alert.AlertType.INFORMATION,"Order Deleted!").show();
+                        if(orderBo.delete(tm.getOrderID())){
+                            new Alert(Alert.AlertType.INFORMATION,"Order is Deleted!").show();
                             loadData();
                         }else {
                             new Alert(Alert.AlertType.WARNING,"Try Again!").show();

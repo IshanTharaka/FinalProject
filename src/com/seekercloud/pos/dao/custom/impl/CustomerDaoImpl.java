@@ -69,7 +69,15 @@ public class CustomerDaoImpl implements CustomerDao {
     }
 
     @Override
+    public ResultSet getLastID() throws SQLException, ClassNotFoundException {
+        String sql1 = "SELECT * FROM Customer ORDER BY id DESC LIMIT 1";
+        return CrudUtil.execute(sql1);
+    }
+
+
+    @Override
     public ArrayList<Customer> searchCustomer(String searchText) throws SQLException, ClassNotFoundException {
+
         String sql = "SELECT * FROM Customer WHERE name LIKE ? || address LIKE ?";
 //        PreparedStatement statement = DBConnection.getInstance().getConnection().prepareStatement(sql);
 //        statement.setString(1,searchText);
@@ -85,5 +93,34 @@ public class CustomerDaoImpl implements CustomerDao {
                     set.getDouble(4)));
         }
         return list;
+    }
+
+    @Override
+    public ArrayList<Customer> getCustomerDetails(String id) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT * FROM Customer WHERE id=?";
+        ResultSet set = CrudUtil.execute(sql,id);
+
+        ArrayList<Customer> list = new ArrayList<>();
+
+        while (set.next()) {
+            list.add(new Customer(set.getString(1),
+                    set.getString(2),
+                    set.getString(3),
+                    set.getDouble(4)));
+        }
+        return list;
+    }
+
+    @Override
+    public ArrayList<String> getCustomerIDs() throws SQLException, ClassNotFoundException {
+        String sql = "SELECT id FROM Customer";
+        ResultSet resultSet = CrudUtil.execute(sql);
+
+        ArrayList<String> idList = new ArrayList<>();
+        while (resultSet.next()){
+            idList.add(resultSet.getString(1));
+        }
+
+        return idList;
     }
 }

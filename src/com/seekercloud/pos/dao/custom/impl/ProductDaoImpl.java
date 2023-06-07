@@ -3,6 +3,7 @@ package com.seekercloud.pos.dao.custom.impl;
 import com.seekercloud.pos.dao.CrudUtil;
 import com.seekercloud.pos.dao.custom.ProductDao;
 import com.seekercloud.pos.db.DBConnection;
+import com.seekercloud.pos.entity.Customer;
 import com.seekercloud.pos.entity.Product;
 
 import java.sql.PreparedStatement;
@@ -48,6 +49,12 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
+    public ResultSet getLastID() throws SQLException, ClassNotFoundException {
+        String sql1 = "SELECT * FROM Product ORDER BY code DESC LIMIT 1";
+        return CrudUtil.execute(sql1);
+    }
+
+    @Override
     public ArrayList<Product> searchProduct(String searchText) throws SQLException, ClassNotFoundException {
         String sql = "SELECT * FROM Product WHERE description LIKE ?";
 //        PreparedStatement statement = DBConnection.getInstance().getConnection().prepareStatement(sql);
@@ -64,5 +71,33 @@ public class ProductDaoImpl implements ProductDao {
                     set.getInt(4)));
         }
         return productList;
+    }
+
+    @Override
+    public ArrayList<Product> getProductDetails(String id) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT * FROM Product WHERE code=?";
+        ResultSet set = CrudUtil.execute(sql,id);
+
+        ArrayList<Product> list = new ArrayList<>();
+
+        while (set.next()) {
+            list.add(new Product(set.getString(1),
+                    set.getString(2),
+                    set.getDouble(3),
+                    set.getInt(4)));
+        }
+        return list;
+    }
+
+    @Override
+    public ArrayList<String> getProductIDs() throws SQLException, ClassNotFoundException {
+        String sql1 = "SELECT code FROM Product";
+        ResultSet resultSet = CrudUtil.execute(sql1);
+
+        ArrayList<String> idList = new ArrayList<>();
+        while (resultSet.next()){
+            idList.add(resultSet.getString(1));
+        }
+        return idList;
     }
 }

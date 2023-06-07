@@ -1,6 +1,6 @@
-package com.seekercloud.pos.model;
+package com.seekercloud.pos.entity;
 
-public class CartItem {
+public class CartItem implements SuperEntity{
     private String code;
     private int qty;
     private double unitPrice;
